@@ -3,6 +3,7 @@ package com.erbayaskin.basicBackend;
 import com.erbayaskin.basicBackend.security.JwtAuthenticationFilter;
 import com.erbayaskin.basicBackend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
@@ -34,6 +35,9 @@ public class SecurityConfiguration {
     @Autowired
     private UserService userService;
 
+    @Value("${client.name.list}")
+    private String clientNameList;
+
     public SecurityConfiguration(
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
@@ -48,6 +52,8 @@ public class SecurityConfiguration {
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())) // frameOptions() devre dışı bırakmak yerine sameOrigin kullan
 
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.GET,"/user/backend-endpoint").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/user/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/user/register").permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll() // H2 console'a izin ver
@@ -65,7 +71,7 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of(clientNameList));
         configuration.setAllowedMethods(List.of("GET","POST"));
         configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
 

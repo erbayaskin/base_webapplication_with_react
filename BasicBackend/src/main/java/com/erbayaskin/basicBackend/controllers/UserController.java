@@ -8,6 +8,8 @@ import com.erbayaskin.basicBackend.security.JwtService;
 import com.erbayaskin.basicBackend.services.AuthenticationService;
 import com.erbayaskin.basicBackend.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.observation.annotation.Observed;
+import javassist.bytecode.stackmap.Tracer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
     @Autowired
     UserService userService;
     @Autowired
@@ -29,6 +32,7 @@ public class UserController {
     @Autowired
     JwtService jwtService;
 
+//    @Observed(name = "com.erbayaskin.basicBackend.controllers.login", contextualName = "Login İşlemi")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<CommonResponse> loginUser(@RequestBody User user) {
         try{
@@ -56,7 +60,7 @@ public class UserController {
         }
 
     }
-
+//    @Observed(name = "com.erbayaskin.basicBackend.controllers.register", contextualName = "Kayıt İşlemi")
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<CommonResponse> registerUser(@RequestBody UserDTO user) {
         try {
@@ -73,7 +77,7 @@ public class UserController {
                     CommonResponse.builder().message(e.getMessage()).status(501).build(), HttpStatus.EXPECTATION_FAILED);
         }
     }
-
+//    @Observed(name = "com.erbayaskin.basicBackend.controllers.updateUser", contextualName = "Güncelleme İşlemi")
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public ResponseEntity<CommonResponse> updateUser(@RequestBody(required = false) UserDTO user) {
         try {
@@ -97,7 +101,7 @@ public class UserController {
         }
     }
 
-
+//    @Observed(name = "com.erbayaskin.basicBackend.controllers.getUserList", contextualName = "Tüm kullanıcıları getirme İşlemi")
     @RequestMapping(value = "/getAll", method = RequestMethod.GET)
     public ResponseEntity<CommonResponse> getUserList() {
         try {
@@ -111,8 +115,9 @@ public class UserController {
         }
     }
 
+//    @Observed(name = "com.erbayaskin.basicBackend.controllers.getUserListPageable", contextualName = "Tüm kullanıcıları Sayfalı getirme İşlemi")
     @RequestMapping(value = "/getAllPageable", method = RequestMethod.GET)
-    public ResponseEntity<CommonResponse> getUserList(@RequestParam("page") int page,
+    public ResponseEntity<CommonResponse> getUserListPageable(@RequestParam("page") int page,
                                                       @RequestParam("size") int size) {
         try {
             Page<User> list = userService.getAllPageableUsers(PageRequest.of(page, size));
@@ -124,7 +129,7 @@ public class UserController {
                     CommonResponse.builder().message(e.getMessage()).status(501).build(), HttpStatus.EXPECTATION_FAILED);
         }
     }
-
+//    @Observed(name = "com.erbayaskin.basicBackend.controllers.getUser", contextualName = "Kullanıcı getirme İşlemi")
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
     public ResponseEntity<CommonResponse> getUser(@PathVariable Long id) {
         try {
@@ -137,7 +142,7 @@ public class UserController {
                     CommonResponse.builder().message(e.getMessage()).status(404).build(), HttpStatus.NOT_FOUND);
         }
     }
-
+ //   @Observed(name = "com.erbayaskin.basicBackend.controllers.deleteUser", contextualName = "Kullanıcı silme İşlemi")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<CommonResponse> deleteUser(@PathVariable Long id) {
         try {

@@ -1,0 +1,43 @@
+services:
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    environment:
+      - STORAGE_TYPE=mem
+    ports:
+      - "9411:9411"
+    networks:
+      - first_network
+  basic_backend:
+    image: basic_backend_new:latest
+    container_name: basic_backend
+    restart: always
+    build:
+      context: ./BasicBackend
+      dockerfile: Dockerfile
+    ports:
+      - "80:8080"
+    networks:
+      - first_network
+    environment:
+      - CLIENT_NAME_LIST=http://basic_frontend:8088,http://localhost:5173,http://localhost:3000,http://zipkin:9411
+      - SPRING_ZIPKIN_BASE_URL=http://zipkin:9411/api/v2/spans
+    depends_on:
+      - zipkin
+
+  basic_frontend:
+    image: basic_frontend:latest
+    container_name: basic_frontend
+    restart: always
+    build:
+      context: ./BasicFrontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:8088"
+    networks:
+      - first_network
+
+networks:
+  first_network:
+    driver: bridge
+    attachable: true

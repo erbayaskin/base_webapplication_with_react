@@ -21,5 +21,4 @@ public class Role {
     private long id;
     @Column(name="role", unique = true)
     private String role_name;
-
 }
